@@ -4,7 +4,7 @@
 E2Lib.RegisterExtension("gravityGun", true, "Allows E2 chips to listen to gravity gun related triggers.")
 
 local IsValid = IsValid
-
+i
 local GravPuntList = {
     last = { nil, nil, 0 }
 }
@@ -19,7 +19,7 @@ end)
 
 hook.Add("GravGunPunt","Exp2GravPunt",function(ply,entity)
     local entry = { ply, entity, CurTime() }
-    GravPuntList[ply:EntIndex()] = entry
+    --GravPuntList[ply:EntIndex()] = entry
     GravPuntList.last = entry
     for e in pairs(GravPuntAlert) do
         if IsValid(e) then
@@ -34,17 +34,17 @@ end)
          
 
 
-
+--[[
 hook.Add("EntityRemoved","Exp2GravPuntPlayerDisconnect", function(ply)
     GravPuntList[ply:EntIndex()] = nil
 end)
-
+]]--
 --[[************************************************************************]]--
 
 __e2setcost(1)
 
 --- If <activate> == 0, the chip will no longer run on grav punt events, otherwise it makes this chip execute when someone punts an entity.
-e2function void runOnGravPunt(activate)
+e2function void runOnGravPunt(activate)k
     if activate ~= 0 then
         GravPuntAlert[self.entity] = true
     else
@@ -72,3 +72,36 @@ e2function number gravPuntedClk(ent)
 end
 
 --[[************************************************************************]]--
+
+__e2setcost(3)
+
+--- Returns the last player to have punted an entity.
+e2function entity lastGravPunter()
+    local entry = GravPuntList.last
+    if not entry then return nil end
+    
+    local ply = entry[1]
+    if not IsValid(ply) then return nil end
+    if not ply:IsPlayer() then return nil end
+    
+    return ply
+end
+
+--- Returns the last entity to have been punted.
+e2function entity lastGravPunted()
+    local entry = GravPuntList.last
+    if not entry then return nil end
+    
+    local ent = entry[2]
+    if not IsValid(ent) then return nil end
+    
+    return ent
+end
+
+--- Returns the time the last entity was punted.
+e2function number lastGravPuntWhen()
+    local entry = GravPuntList.last
+    if not entry then return 0 end
+
+    return entry[3]
+end
